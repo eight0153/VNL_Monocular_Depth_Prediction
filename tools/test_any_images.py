@@ -65,4 +65,9 @@ if __name__ == '__main__':
             pred_depth = pred_depth.cpu().numpy().squeeze()
             pred_depth_scale = (pred_depth / pred_depth.max() * 60000).astype(np.uint16)  # scale 60000 for visualization
 
-            cv2.imwrite(os.path.join(path, i.split('.')[0] + '-raw.png'), pred_depth_scale)
+            # Generate image with input and predicted depth map side-by-side
+            img_rgb = (img_resize / img_resize.max() * 60000).astype(np.uint16) # use same scaling as depth map
+            pred_rgb = np.tile(np.expand_dims(pred_depth_scale, axis=-1), (1, 1, 3))           
+            side_by_side = np.concatenate((img_rgb, pred_rgb), axis=1)
+            
+            cv2.imwrite(os.path.join(path, i.split('.')[0] + '-raw.png'), side_by_side)
